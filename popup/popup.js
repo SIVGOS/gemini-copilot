@@ -1,5 +1,8 @@
 // popup.js — orchestrates the chat UI
 
+// Cross-browser API compatibility (Chrome uses `chrome`, Safari/Firefox use `browser`)
+const api = typeof browser !== "undefined" ? browser : chrome; // eslint-disable-line no-undef
+
 const messagesEl = document.getElementById("messages");
 const userInput  = document.getElementById("user-input");
 const btnSend    = document.getElementById("btn-send");
@@ -33,7 +36,7 @@ async function init() {
 // ── Storage ───────────────────────────────────────────────────────────────
 
 async function loadChatHistory() {
-  const { chatHistory } = await chrome.storage.local.get("chatHistory");
+  const { chatHistory } = await api.storage.local.get("chatHistory");
   if (!chatHistory?.length) return;
 
   conversationHistory = chatHistory;
@@ -48,13 +51,13 @@ function saveChatHistory() {
   if (conversationHistory.length > HISTORY_CAP) {
     conversationHistory = conversationHistory.slice(-HISTORY_CAP);
   }
-  chrome.storage.local.set({ chatHistory: conversationHistory });
+  api.storage.local.set({ chatHistory: conversationHistory });
 }
 
 // ── Port ──────────────────────────────────────────────────────────────────
 
 function connectPort() {
-  port = chrome.runtime.connect({ name: "gemini-chat" });
+  port = api.runtime.connect({ name: "gemini-chat" });
   port.onDisconnect.addListener(() => {
     port = null;
     setTimeout(connectPort, 200);
@@ -66,10 +69,10 @@ function connectPort() {
 
 async function loadPageContext() {
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [tab] = await api.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) throw new Error("no tab");
 
-    const ctx = await chrome.tabs.sendMessage(tab.id, { type: "GET_PAGE_CONTEXT" });
+    const ctx = await api.tabs.sendMessage(tab.id, { type: "GET_PAGE_CONTEXT" });
     pageContext = ctx;
 
     const label = document.createElement("span");
@@ -234,13 +237,13 @@ userInput.addEventListener("input", autoResizeTextarea);
 
 btnClear.addEventListener("click", () => {
   conversationHistory = [];
-  chrome.storage.local.remove("chatHistory");
+  api.storage.local.remove("chatHistory");
   messagesEl.innerHTML = "";
   addSystemMessage("Chat cleared. Page context retained.");
 });
 
 btnOptions.addEventListener("click", () => {
-  chrome.runtime.openOptionsPage();
+  api.runtime.openOptionsPage();
 });
 
 // ── Boot ──────────────────────────────────────────────────────────────────

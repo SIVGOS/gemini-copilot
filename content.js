@@ -1,9 +1,12 @@
 // Content script — injected into every page.
 // Responds to requests for page context from popup.js.
 
+// Cross-browser API compatibility (Chrome uses `chrome`, Safari/Firefox use `browser`)
+const api = typeof browser !== "undefined" ? browser : chrome; // eslint-disable-line no-undef
+
 const MAX_TEXT_LENGTH = 12000;
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+api.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type !== "GET_PAGE_CONTEXT") return false;
 
   const title = document.title || "";

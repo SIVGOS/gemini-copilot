@@ -1,9 +1,12 @@
 // Service worker — handles all Gemini API calls.
 // Communicates with popup.js via a long-lived Port.
 
+// Cross-browser API compatibility (Chrome uses `chrome`, Safari/Firefox use `browser`)
+const api = typeof browser !== "undefined" ? browser : chrome; // eslint-disable-line no-undef
+
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview";
 
-chrome.runtime.onConnect.addListener((port) => {
+api.runtime.onConnect.addListener((port) => {
   if (port.name !== "gemini-chat") return;
 
   port.onMessage.addListener(async (message) => {
@@ -17,14 +20,14 @@ async function handleChatMessage(port, message) {
   const { history, pageContext } = message;
 
   // Retrieve API key
-  const { geminiApiKey } = await chrome.storage.local.get("geminiApiKey");
+  const { geminiApiKey } = await api.storage.local.get("geminiApiKey");
   if (!geminiApiKey) {
     port.postMessage({ type: "ERROR", error: "No API key set. Open Options to add your Gemini API key." });
     return;
   }
 
   // Build system instruction with page context
-  let systemText = "You are a helpful assistant embedded in a Chrome extension. Answer the user's questions clearly and concisely.";
+  let systemText = "You are a helpful assistant embedded in a browser extension. Answer the user's questions clearly and concisely.";
   if (pageContext && pageContext.url) {
     systemText += `\n\nThe user is currently viewing a webpage:`;
     systemText += `\nTitle: ${pageContext.title || "(no title)"}`;

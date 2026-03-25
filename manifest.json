@@ -29,7 +29,12 @@
   ],
   "options_ui": {
     "page": "options/options.html",
-    "open_in_tab": false
+    "open_in_tab": true
+  },
+  "browser_specific_settings": {
+    "safari": {
+      "strict_min_version": "16.0"
+    }
   },
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [

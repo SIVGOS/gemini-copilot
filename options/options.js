@@ -1,10 +1,13 @@
+// Cross-browser API compatibility (Chrome uses `chrome`, Safari/Firefox use `browser`)
+const api = typeof browser !== "undefined" ? browser : chrome; // eslint-disable-line no-undef
+
 const apiKeyInput = document.getElementById("api-key-input");
 const btnSave = document.getElementById("btn-save");
 const statusEl = document.getElementById("status");
 const toggleBtn = document.getElementById("toggle-visibility");
 
 // Load existing key on open
-chrome.storage.local.get("geminiApiKey", ({ geminiApiKey }) => {
+api.storage.local.get("geminiApiKey").then(({ geminiApiKey }) => {
   if (geminiApiKey) {
     apiKeyInput.value = geminiApiKey;
   }
@@ -31,7 +34,7 @@ btnSave.addEventListener("click", () => {
     return;
   }
 
-  chrome.storage.local.set({ geminiApiKey: key }, () => {
+  api.storage.local.set({ geminiApiKey: key }).then(() => {
     showStatus("Saved!", "success");
   });
 });
