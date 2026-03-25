@@ -34,10 +34,10 @@ The extension automatically reads the current page when the popup opens:
 ### API Key (Options Page)
 - Right-click the extension icon → **Options**
 - Enter your Gemini API key (get one free at https://aistudio.google.com/app/apikey)
-- Key is stored locally in Chrome, never leaves your device except in API calls to Google
+- Key is stored locally in your browser, never leaves your device except in API calls to Google
 
 ## Limitations
-- Does not work on `chrome://` pages, `chrome-extension://` pages, or local PDFs
+- Does not work on browser internal pages (`chrome://`, `safari://`, `chrome-extension://`) or local PDFs
 - Page text is truncated at ~12,000 characters on very long pages
 - Conversation history is in-memory only — resets when popup closes
 - Images and visual content on pages are not sent to Gemini (text only)

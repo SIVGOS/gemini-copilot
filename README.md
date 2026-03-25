@@ -1,8 +1,9 @@
 # Gemini Copilot
 
-A personal Chrome Extension that lets you chat with Google Gemini about any webpage you're browsing. Ask it to summarize, explain, extract, or answer questions — with full context of the current page.
+A personal browser extension that lets you chat with Google Gemini about any webpage you're browsing. Ask it to summarize, explain, extract, or answer questions — with full context of the current page.
 
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-blue?logo=googlechrome)
+![Safari Extension](https://img.shields.io/badge/Safari-Extension-blue?logo=safari)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-green)
 ![No Build Step](https://img.shields.io/badge/Build-None%20required-lightgrey)
 
@@ -15,13 +16,13 @@ A personal Chrome Extension that lets you chat with Google Gemini about any webp
 - **Markdown rendering** — bold, code blocks, lists, tables all render properly
 - **Persistent history** — conversation survives closing and reopening the popup
 - **Copy button** — hover any message to copy its raw text to clipboard
-- **No build step** — plain vanilla JS, load directly in Chrome
+- **No build step** — plain vanilla JS, load directly in your browser
 
 ---
 
 ## Prerequisites
 
-- Google Chrome (or any Chromium-based browser)
+- Google Chrome, Safari 16+, or any Chromium-based browser
 - A free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ---
@@ -35,14 +36,21 @@ git clone https://github.com/your-username/gemini-copilot.git
 cd gemini-copilot
 ```
 
-### 2. Load the extension in Chrome
+### 2. Load the extension in your browser
 
-1. Open Chrome and go to `chrome://extensions`
+**Chrome / Chromium-based browsers**
+1. Go to `chrome://extensions`
 2. Enable **Developer mode** (toggle in the top-right corner)
-3. Click **Load unpacked**
-4. Select the cloned `gemini-copilot` folder
+3. Click **Load unpacked** → select the cloned `gemini-copilot` folder
 
-The extension icon will appear in your Chrome toolbar.
+**Safari**
+1. Open **Safari** → **Develop** menu → **Show Extension Builder**
+   *(enable the Develop menu in Safari → Settings → Advanced → Show Develop menu)*
+2. Click **+** → **Add Extension** → select the cloned `gemini-copilot` folder
+3. Click **Run** to load the extension
+4. Go to **Safari → Settings → Extensions** and enable **Gemini Copilot**
+
+The extension icon will appear in your browser toolbar.
 
 ### 3. Add your Gemini API key
 
@@ -51,7 +59,7 @@ The extension icon will appear in your Chrome toolbar.
 2. Paste your Gemini API key into the input field
 3. Click **Save**
 
-Your key is stored locally in Chrome and never leaves your device except in direct API calls to Google.
+Your key is stored locally in your browser and never leaves your device except in direct API calls to Google.
 
 ---
 
@@ -92,7 +100,7 @@ Click the **↺** button in the popup header. This clears both the on-screen con
 
 ```
 gemini-copilot/
-├── manifest.json       # Chrome Extension Manifest V3
+├── manifest.json       # Browser Extension Manifest V3
 ├── background.js       # Service worker — Gemini API calls + streaming
 ├── content.js          # Content script — extracts page text
 ├── popup/
@@ -140,7 +148,7 @@ const MAX_TEXT_LENGTH = 12000;
 
 ## Limitations
 
-- Does not work on `chrome://` pages, extension pages, or local PDFs
+- Does not work on browser internal pages (`chrome://`, `safari://`, extension pages) or local PDFs
 - Page content is text-only — images and visual elements are not sent to Gemini
 - Conversation history resets context on page change (page context is always re-read from the live tab)
 - Requires an internet connection to reach the Gemini API
@@ -149,7 +157,7 @@ const MAX_TEXT_LENGTH = 12000;
 
 ## Privacy
 
-- Your Gemini API key is stored only in `chrome.storage.local` on your device
+- Your Gemini API key is stored only in browser local storage on your device
 - Page content and chat messages are sent to Google's Gemini API — review [Google's privacy policy](https://policies.google.com/privacy) for details
 - No data is sent to any server other than `generativelanguage.googleapis.com`
 

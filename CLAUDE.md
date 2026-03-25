@@ -1,7 +1,7 @@
 # Gemini Copilot — Chrome Extension
 
 ## Project Overview
-A personal-use Chrome Extension (Manifest V3) that opens as a popup on any website, reads the page content, and answers questions using the Google Gemini API. Responses are streamed and rendered as Markdown. Chat history is persisted across sessions via `chrome.storage.local`.
+A personal-use browser extension (Manifest V3) that opens as a popup on any website, reads the page content, and answers questions using the Google Gemini API. Supports Chrome, Safari 16+, and other Chromium-based browsers. Responses are streamed and rendered as Markdown. Chat history is persisted across sessions via the browser's local storage API.
 
 ## File Structure
 
@@ -36,12 +36,12 @@ background.js  →  popup.js     forward streaming tokens via Port
 ```
 
 ### API Key Storage
-- Stored in `chrome.storage.local` — never synced to Google account, never exposed to page scripts
+- Stored in browser local storage (`chrome.storage.local` / `browser.storage.local`) — never synced to Google account, never exposed to page scripts
 - Only `background.js` reads the key; `popup.js` never sees it
 - Set via the Options page (right-click extension icon → Options)
 
 ### Chat History Persistence
-- Stored in `chrome.storage.local` under key `chatHistory`
+- Stored in browser local storage under key `chatHistory`
 - Written **only on `STREAM_END`** (once per completed exchange) — no read-modify-write, no race condition
 - In-memory `conversationHistory` array is the single source of truth during a session; storage is write-only mid-session
 - Capped at 40 entries (~20 exchanges); oldest entries trimmed before each write
@@ -60,23 +60,36 @@ background.js  →  popup.js     forward streaming tokens via Port
 
 ### Content Extraction
 - `content.js` extracts `document.body.innerText`, collapses whitespace, truncates at 12,000 characters
-- Gracefully skips context on `chrome://` pages, `chrome-extension://` pages, and PDFs
+- Gracefully skips context on browser internal pages (`chrome://`, `safari://`, `chrome-extension://`) and PDFs
 
 ## Local Installation
 
-1. Open `chrome://extensions` in Chrome
+**Chrome / Chromium-based browsers**
+1. Open `chrome://extensions`
 2. Enable **Developer mode** (top-right toggle)
 3. Click **Load unpacked** → select this folder
+4. Right-click the extension icon → **Options** → paste Gemini API key → Save
+
+**Safari**
+1. Open **Safari** → **Develop** menu → **Show Extension Builder**
+2. Click **+** → **Add Extension** → select this folder
+3. Click **Run**, then enable the extension in Safari → Settings → Extensions
 4. Right-click the extension icon → **Options** → paste Gemini API key → Save
 
 ## Getting a Gemini API Key
 Visit https://aistudio.google.com/app/apikey and create a free API key.
 
 ## Debugging
+
+**Chrome**
 - **Popup**: Right-click the popup → Inspect
 - **Service Worker**: `chrome://extensions` → click "service worker" link
 - **Content Script**: DevTools on any page → Sources → Content Scripts tab
 - **Reload after edits**: `chrome://extensions` → click the ↺ icon on the extension card
+
+**Safari**
+- **Popup / Content Script**: Safari → Develop → Web Extension Background Pages → Gemini Copilot
+- **Reload after edits**: Safari → Settings → Extensions → disable then re-enable the extension
 
 ## Permissions Used
 | Permission | Why |
@@ -91,3 +104,6 @@ Visit https://aistudio.google.com/app/apikey and create a free API key.
 - Service worker (`background.js`) must NOT use ES module `import` syntax
 - Popup lifetime is short; all network calls go through the service worker to avoid interruption
 - `marked.min.js` must not be loaded from a CDN — MV3 CSP blocks external scripts in extension pages
+- Cross-browser API shim: all files use `const api = typeof browser !== "undefined" ? browser : chrome` — use `api.*` everywhere, never `chrome.*` directly
+- Safari requires `open_in_tab: true` in the options_ui manifest entry (inline popups not supported)
+- `browser_specific_settings.safari.strict_min_version` is set to `"16.0"` in manifest.json
